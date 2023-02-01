@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "758a9b2288ddf430d8d931bb781aad49",
+    "content-hash": "e4db0f8cd27ebfcdcb865e2b24d45025",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -3037,6 +3037,57 @@
                 "source": "https://github.com/silverstripe/silverstripe-mimevalidator/tree/2.4.0"
             },
             "time": "2022-05-04T01:29:40+00:00"
+        },
+        {
+            "name": "silverstripe/postgresql",
+            "version": "2.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silverstripe/silverstripe-postgresql.git",
+                "reference": "84e13ffde38ab9659388e683d461e33db6d2a7c0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silverstripe/silverstripe-postgresql/zipball/84e13ffde38ab9659388e683d461e33db6d2a7c0",
+                "reference": "84e13ffde38ab9659388e683d461e33db6d2a7c0",
+                "shasum": ""
+            },
+            "require": {
+                "silverstripe/framework": "^4",
+                "silverstripe/vendor-plugin": "^1.0"
+            },
+            "require-dev": {
+                "sminnee/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "silverstripe-vendormodule",
+            "autoload": {
+                "psr-4": {
+                    "SilverStripe\\PostgreSQL\\": "code/",
+                    "SilverStripe\\PostgreSQL\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Minnée",
+                    "email": "sam@silverstripe.com"
+                }
+            ],
+            "description": "SilverStripe now has tentative support for PostgreSQL ('Postgres')",
+            "keywords": [
+                "database",
+                "postgresql",
+                "silverstripe"
+            ],
+            "support": {
+                "issues": "https://github.com/silverstripe/silverstripe-postgresql/issues",
+                "source": "https://github.com/silverstripe/silverstripe-postgresql/tree/2.3.2"
+            },
+            "time": "2022-04-21T06:40:22+00:00"
         },
         {
             "name": "silverstripe/recipe-cms",
