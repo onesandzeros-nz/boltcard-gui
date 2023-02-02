@@ -7,7 +7,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\CMS\Controllers\ContentController;
 
-    class CardController extends PageController
+    class CardEditController extends PageController
     {
         /**
          * An array of actions that can be accessed via a request. Each array element should be an action name, and the
@@ -25,11 +25,9 @@ use SilverStripe\CMS\Controllers\ContentController;
          * @var array
          */
         private static $allowed_actions = [
-            'view',
-            'edit',
-            'payments',
-            'createcard',
-            'wipe',
+            'index',
+            'Form',
+            'save',
         ];
 
         protected function init()
@@ -39,21 +37,14 @@ use SilverStripe\CMS\Controllers\ContentController;
             // See: https://docs.silverstripe.org/en/developer_guides/templates/requirements/
         }
 
-        public function view(){
+        public function index(){
             $card_id = $this->request->Param('ID');
             $card = cards::get()->find('card_id', $card_id);
 
-            return $this->customise(['Card'=>$card])->renderWith(['CardPage', 'Page']);
+            return $this->customise(['Card'=>$card])->renderWith(['Page']);
         }
 
-        public function payments(){
-            $card_id = $this->request->Param('ID');
-            $card = cards::get()->find('card_id', $card_id);
-
-            return $this->customise(['Card'=>$card])->renderWith(['CardPayments', 'Page']);
-        }
-
-        public function edit(){
+        public function Form(){
             $card_id = $this->request->Param('ID');
             $card = cards::get()->find('card_id', $card_id);
 
@@ -61,20 +52,15 @@ use SilverStripe\CMS\Controllers\ContentController;
             $actions = FieldList::create(
                 FormAction::create('save', 'Save')
             );
-            $form = Form::create($this, 'edit', $fields, $actions);
+            $form = Form::create($this, 'Form', $fields, $actions);
+
+            $fields->setValues($card ? $card->toMap() : []);
             return $form;
         }
 
-        public function save() {
-            
+        public function save($data, $form) {
+            die(print_r($data,true));
         }
 
-        public function createcard() {
-            die('not implemeted');
-        }
-
-        public function wipe() {
-            die('not implemeted');
-        }
     }
 }

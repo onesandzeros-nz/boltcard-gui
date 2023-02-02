@@ -3,7 +3,6 @@
 	<% with Card %>
 
 		<h1>$card_name</h1>
-
 		<table>
 			<tr><th>uid</th><td>$uid</td></tr>
 			<tr><th>last_counter_value</th><td>$last_counter_value</td></tr>
@@ -21,6 +20,7 @@
 			<tr><th>allow_negative_balance</th><td>$allow_negative_balance</td></tr>
 			<tr><th>wiped</th><td>$wiped</td></tr>
 		</table>
+		<a class="btn btn-primary" href="CardEditController/index/$card_id">Edit Card</a>
 
 	<% end_with %>		
 </div>

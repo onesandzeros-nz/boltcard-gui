@@ -71,4 +71,11 @@ class cards extends DataObject {
     	return card_payments::get()->filter('card_id', $this->card_id);
     }
 
+    public function PaymentsTotal() {
+    	$total = 0;
+    	foreach($this->Payments() as $payment) {
+    		$total+= $payment->amount_msats;
+    	}
+    	return $total;
+    }
 }
