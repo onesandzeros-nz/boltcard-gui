@@ -8,6 +8,7 @@ class CardsAdmin extends ModelAdmin {
 
     private static $managed_models = [
         cards::class,
+        card_payments::class,
     ];
 
     private static $url_segment = 'cards';

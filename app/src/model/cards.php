@@ -28,7 +28,7 @@ class cards extends DataObject {
 		"email_enable" => "Varchar(1)",//               | Varchar(1)                |           | not null | 'N'::bpchar
 		"uid_privacy" => "Varchar(1)",//                | Varchar(1)                |           | not null | 'N'::bpchar
 		"one_time_code" => "Varchar(32)",//               | Varchar(32)               |           | not null | ''::bpchar
-		"one_time_code_expiry" => "Date",//        | timestamp with time zone    |           |          | now() + '1 day'::interval
+		"one_time_code_expiry" => "Datetime",//        | timestamp with time zone    |           |          | now() + '1 day'::interval
 		"one_time_code_used" => "Varchar(1)",//         | Varchar(1)                |           | not null | 'Y'::bpchar
 		"allow_negative_balance" => "Varchar(1)",//     | Varchar(1)                |           | not null | 'N'::bpchar
 		"wiped" => "Varchar(1)",//                      | Varchar(1)                |           | not null | 'N'::bpchar
@@ -47,7 +47,14 @@ class cards extends DataObject {
     ];
 
 	private static $summary_fields = [
-
+		"card_name",
+		"card_id",
+		"tx_limit_sats",
+		"day_limit_sats",
+		"lnurlw_enable",
+		"lnurlp_enable",
+		"allow_negative_balance",
+		"email_enable",
 	];
 
 	private static $owns = [
@@ -60,4 +67,15 @@ class cards extends DataObject {
 
     // private static $default_sort = 'Sort ASC';
 
+    public function Payments() {
+    	return card_payments::get()->filter('card_id', $this->card_id);
+    }
+
+    public function PaymentsTotal() {
+    	$total = 0;
+    	foreach($this->Payments() as $payment) {
+    		$total+= $payment->amount_msats;
+    	}
+    	return $total;
+    }
 }
