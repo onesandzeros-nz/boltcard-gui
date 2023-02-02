@@ -67,4 +67,8 @@ class cards extends DataObject {
 
     // private static $default_sort = 'Sort ASC';
 
+    public function Payments() {
+    	return card_payments::get()->filter('card_id', $this->card_id);
+    }
+
 }

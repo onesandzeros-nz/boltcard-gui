@@ -4,7 +4,7 @@ namespace {
 
     use SilverStripe\CMS\Controllers\ContentController;
 
-    class PageController extends ContentController
+    class CardController extends PageController
     {
         /**
          * An array of actions that can be accessed via a request. Each array element should be an action name, and the
@@ -21,7 +21,10 @@ namespace {
          *
          * @var array
          */
-        private static $allowed_actions = [];
+        private static $allowed_actions = [
+            'view',
+            'payments'
+        ];
 
         protected function init()
         {
@@ -30,8 +33,18 @@ namespace {
             // See: https://docs.silverstripe.org/en/developer_guides/templates/requirements/
         }
 
-        public function Cards(){
-            return cards::get();
+        public function view(){
+            $card_id = $this->request->Param('ID');
+            $card = cards::get()->find('card_id', $card_id);
+
+            return $this->customise(['Card'=>$card])->renderWith(['CardPage', 'Page']);
+        }
+
+        public function payments(){
+            $card_id = $this->request->Param('ID');
+            $card = cards::get()->find('card_id', $card_id);
+
+            return $this->customise(['Card'=>$card])->renderWith(['CardPayments', 'Page']);
         }
     }
 }
