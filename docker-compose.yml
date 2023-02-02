@@ -1,0 +1,41 @@
+version: "3"
+services:
+  silverstripe:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    container_name: boltgui_frontend
+    depends_on:
+      - db
+    environment:
+      - DOCUMENT_ROOT=/var/www/html
+      - SS_TRUSTED_PROXY_IPS=*
+      - SS_ENVIRONMENT_TYPE=${SS_ENVIRONMENT_TYPE}
+      - SS_DATABASE_SERVER=db
+      - SS_DATABASE_NAME=card_db
+      - SS_DATABASE_USERNAME=cardapp
+      - SS_DATABASE_PASSWORD=${DB_PASSWORD}
+      - SS_DEFAULT_ADMIN_USERNAME=${SS_DEFAULT_ADMIN_USERNAME}
+      - SS_DEFAULT_ADMIN_PASSWORD=${SS_DEFAULT_ADMIN_PASSWORD}
+      - SS_DATABASE_CLASS=PostgreSQLDatabase
+    ports:
+      - 8081:80
+    networks:
+      - boltgui
+  db:
+    image: postgres
+    container_name: boltgui_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=cardapp
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=card_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - boltgui
+networks:
+  boltgui:
+volumes:
+  db-data:
