@@ -191,9 +191,9 @@ use chillerlan\QRCode\QROptions;
                 return $this->httpError(404);
             }
 
-            if($card->wiped == 'Y') {
-                return $this->httpError(404, 'Card is already wiped');
-            }
+            // if($card->wiped == 'Y') {
+            //     return $this->httpError(404, 'Card is already wiped');
+            // }
 
 
             $query = [
