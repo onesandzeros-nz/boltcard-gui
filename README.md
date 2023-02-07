@@ -32,3 +32,13 @@ docker exec boltcard_main wipeboltcard/wipeboltcard -name card_blank
 docker exec boltcard_db psql -U cardapp card_db
 
 ```
+
+### Dump PSQL DB
+```
+docker exec boltcard_db pg_dump -U cardapp card_db > card_db.sql
+```
+
+### weird docker errors?
+```
+docker system prune -a.
+```
