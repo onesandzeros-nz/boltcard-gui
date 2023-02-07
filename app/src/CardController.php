@@ -154,7 +154,7 @@ use chillerlan\QRCode\QRCode;
                 'query' => $query
             ]);
 
-            $response = json_docode($res->getBody());
+            $response = json_decode($res->getBody());
             //IF SUCCESS
             //{"status": "OK", "url": "...."}
             if($response->status == 'OK') {
