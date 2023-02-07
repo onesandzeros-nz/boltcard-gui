@@ -148,16 +148,6 @@ use chillerlan\QRCode\QRCode;
             ];
             $query = array_intersect_key($data, array_flip($whitelist));
             $boltcard_hostname = Environment::getEnv('SS_BOLTCARD_HOST');
-            // $data 
-            $query = [
-                'card_name' => $card_name,
-                'enable' => 'true',
-                'tx_max' => '1000',
-                'day_max' => '10000',
-                'uid_privacy' => 'true',
-                'allow_neg_bal' => 'true'
-            ];
-
 
             $res = (new GuzzleHttp\Client())->request('GET', $boltcard_hostname.':9001/createboltcard', [
                 'query' => $query
