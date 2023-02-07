@@ -149,7 +149,7 @@ use chillerlan\QRCode\QRCode;
             $query = array_intersect_key($data, array_flip($whitelist));
             $boltcard_hostname = Environment::getEnv('SS_BOLTCARD_HOST');
 
-            $res = (new GuzzleHttp\Client())->request('GET', $boltcard_hostname.':9001/createboltcard', [
+            $res = (new GuzzleHttp\Client())->request('GET', 'https://'.$boltcard_hostname.':9001/createboltcard', [
                 'query' => $query
             ]);
             //IF SUCCESS
