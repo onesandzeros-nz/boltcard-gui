@@ -175,7 +175,7 @@ use chillerlan\QRCode\QROptions;
                 $qrcode = (new QRCode($options))->render($url);
 
                 return $this->customise([
-                    'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><p>'.$url.'</p><img src="'.$url.'" alt="QR Code" width="500" height="500" />')
+                    'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><p>'.$url.'</p><img src="'.$qrcode.'" alt="QR Code" width="500" height="500" />')
                 ])->renderWith('Page');
             } else if($response->status == 'ERROR') {
                 $form->sessionMessage('There was an api error: '.$response->reason);
