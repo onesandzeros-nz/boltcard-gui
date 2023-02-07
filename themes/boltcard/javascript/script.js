@@ -132,4 +132,10 @@ jQuery.noConflict();
     };
 // ---------------------------------------------------------
 
+    $('.togglecomposite > div').hide();
+
+    $('.togglecomposite h3').on('click', function(e) {
+    	e.preventDefault();
+    	$(this).siblings('div').toggle();
+    })
 }(jQuery));

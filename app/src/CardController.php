@@ -2,10 +2,18 @@
 
 namespace {
 
+use SilverStripe\CMS\Controllers\ContentController;
+use SilverStripe\Core\Environment;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\CMS\Controllers\ContentController;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\ToggleCompositeField;
+use SilverStripe\ORM\FieldType\DBField;
+use chillerlan\QRCode\QRCode;
 
     class CardController extends PageController
     {
@@ -30,6 +38,7 @@ use SilverStripe\CMS\Controllers\ContentController;
             'payments',
             'createcard',
             'wipe',
+            'CreateCardForm'
         ];
 
         protected function init()
@@ -70,7 +79,107 @@ use SilverStripe\CMS\Controllers\ContentController;
         }
 
         public function createcard() {
-            die('not implemeted');
+            return $this->customise([
+                'Form' => $this->CreateCardForm()
+            ])->renderWith('Page');
+        }
+
+        public function CreateCardForm() {
+            $fields = new FieldList(
+                TextField::create('card_name', 'Card name'),
+                ToggleCompositeField::create('Advanced', 'Advanced', [
+                    CheckboxField::create('enable', 'Enable'),
+                    NumericField::create('tx_max', 'Max transaction (sats)'),
+                    NumericField::create('day_max', 'Daily max (sats)'),
+                    //@TODO: NEED TO WARN PEOPLE WAYING THIS IS UNREVERSABLE 
+                    CheckboxField::create('uid_privacy', 'UID Privacy'),
+                    CheckboxField::create('allow_neg_bal', 'Allow negative balance')
+                ])
+            );
+
+            $defaultVals = [
+                'card_name' => 'Your card',
+                'enable' => true,
+                'tx_max' => '10000',
+                'day_max' => '20000',
+                'uid_privacy' => true,
+                'allow_neg_bal' => false
+            ];
+
+            $fields->setValues($defaultVals);
+
+            $actions = new FieldList(
+                FormAction::create('doCreateCard')->setTitle('Create')
+            );
+
+            $required = new RequiredFields('card_name', 'tx_max', 'day_max');
+
+            $form = new Form($this, 'CreateCardForm', $fields, $actions, $required);
+
+            return $form;
+        }
+
+        public function doCreateCard($data, $form) {
+            // curl 'localhost:9001/createboltcard?card_name=card_5&enable=true&tx_max=1000&day_max=10000&uid_privacy=true&allow_neg_bal=true'
+
+            //validation
+            if($card_exists = cards::get()->find('card_name', $data['card_name'])) {
+                $form->sessionMessage('Card name '.$data['card_name'].' exists');
+                return $this->redirectBack();
+            }
+
+
+            $boolean_values = [
+                'enable', 'uid_privacy', 'allow_neg_bal'
+            ];
+            foreach($data as $key => $val ) {
+                if(in_array($key, $boolean_values)) {
+                    $data[$key] = $val ? 'true' : 'false';
+                }
+            }
+
+            $whitelist = [
+                'card_name',
+                'enable',
+                'tx_max',
+                'day_max',
+                'uid_privacy',
+                'allow_neg_bal'
+            ];
+            $query = array_intersect_key($data, array_flip($whitelist));
+            $boltcard_hostname = Environment::getEnv('SS_BOLTCARD_HOST');
+            // $data 
+            $query = [
+                'card_name' => $card_name,
+                'enable' => 'true',
+                'tx_max' => '1000',
+                'day_max' => '10000',
+                'uid_privacy' => 'true',
+                'allow_neg_bal' => 'true'
+            ];
+
+
+            $res = (new GuzzleHttp\Client())->request('GET', $boltcard_hostname.':9001/createboltcard', [
+                'query' => $query
+            ]);
+            //IF SUCCESS
+            //{"status": "OK", "url": "...."}
+            if($res['status'] == 'OK') {
+                $newCard = cards::get()->find('card_name', $data['card_name']);
+                if(!$newCard) {
+                    $form->sessionMessage('There was a problem creating a new card');
+                    return $this->redirectBack();
+                }
+                $url = $res['url'];
+                $qrcode = (new QRCode($options))->render($url);
+
+                return $this->customise([
+                    'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><p>'.$url.'</p><img src="'.$url.'" alt="QR Code" width="500" height="500" />')
+                ])->renderWith('Page');
+            } else if($res['status'] == 'ERROR') {
+                $form->sessionMessage('There was an api error: '.$res['reason']);
+                return $this->redirectBack();
+            }
         }
 
         public function wipe() {
@@ -78,3 +187,4 @@ use SilverStripe\CMS\Controllers\ContentController;
         }
     }
 }
+
