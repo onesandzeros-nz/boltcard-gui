@@ -136,6 +136,9 @@ use chillerlan\QRCode\QRCode;
                 if(in_array($key, $boolean_values)) {
                     $data[$key] = $val ? 'true' : 'false';
                 }
+                if(filter_var($val, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND)) {
+                    $data[$key] = filter_var($val, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND);
+                }
             }
 
             $whitelist = [
