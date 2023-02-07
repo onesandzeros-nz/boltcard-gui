@@ -14,6 +14,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\ToggleCompositeField;
 use SilverStripe\ORM\FieldType\DBField;
 use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
     class CardController extends PageController
     {
@@ -167,6 +168,10 @@ use chillerlan\QRCode\QRCode;
                     return $this->redirectBack();
                 }
                 $url = $response->url;
+                $options = new QROptions([
+                    'scale' => 20,
+                    'imageTransparent' => false
+                ]);
                 $qrcode = (new QRCode($options))->render($url);
 
                 return $this->customise([
