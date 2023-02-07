@@ -206,7 +206,7 @@ use chillerlan\QRCode\QROptions;
                 'query' => $query
             ]);
 
-            $response = json_decode($res->getBody());
+            $response = json_decode($res->getBody()->__toString());
             //IF SUCCESS
             //{"status": "OK", "url": "...."}
             if($response->status == 'OK') {
