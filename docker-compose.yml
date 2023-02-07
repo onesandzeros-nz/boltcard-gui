@@ -19,7 +19,9 @@ services:
       - SS_DEFAULT_ADMIN_PASSWORD=${SS_DEFAULT_ADMIN_PASSWORD}
       - SS_DATABASE_CLASS=PostgreSQLDatabase
     ports:
-      - 8081:80
+      - 8080:80
+    volumes:
+      - .:/var/www/html
     networks:
       - boltgui
   db:
