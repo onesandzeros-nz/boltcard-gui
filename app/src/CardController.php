@@ -41,8 +41,7 @@ use chillerlan\QRCode\QROptions;
             'payments',
             'createcard',
             'wipe',
-            'CreateCardForm',
-            'WipeCardForm'
+            'CreateCardForm'
         ];
 
         protected function init()
@@ -187,33 +186,13 @@ use chillerlan\QRCode\QROptions;
         }
 
         public function wipe() {
-            return $this->customise([
-                'Form' => $this->WipeCardForm()
-            ])->renderWith('Page');
-        }
-
-        public function WipeCardForm() {
-            $fields = new FieldList(
-                DropdownField::create('card_name', 'Card to wipe: ', cards::get()->filter('wiped:not', 'Y')->map('card_name', 'card_name'))->setEmptyString('Select one')
-            );
-
-
-            $actions = new FieldList(
-                FormAction::create('doWipeCard')->setTitle('Wipe')
-            );
-
-            $required = new RequiredFields('card_id');
-
-            $form = new Form($this, 'WipeCardForm', $fields, $actions, $required);
-
-            return $form;
-        }
-
-        public function doWipeCard($data, $form) {
             //validation
-            if(!$card = cards::get()->find('card_name', $data['card_name'])) {
-                $form->sessionMessage('Card not found');
-                return $this->redirectBack();
+            if(!$card = cards::get()->find('ID', $this->request->param('ID'))) {
+                return $this->httpError(404);
+            }
+
+            if($card->wiped == 'Y') {
+                return $this->httpError(404, 'Card is already wiped');
             }
 
 
@@ -242,8 +221,7 @@ use chillerlan\QRCode\QROptions;
                     'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><img src="'.$qrcode.'" alt="QR Code" width="500" height="500" />')
                 ])->renderWith('Page');
             } else if($response->status == 'ERROR') {
-                $form->sessionMessage('There was an api error: '.$response->reason);
-                return $this->redirectBack();
+                return $this->httpError(500, 'There was an api error: '.$response->reason);
             }
         }
     }
