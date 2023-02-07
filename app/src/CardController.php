@@ -5,9 +5,11 @@ namespace {
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Core\Environment;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextField;
@@ -39,7 +41,8 @@ use chillerlan\QRCode\QROptions;
             'payments',
             'createcard',
             'wipe',
-            'CreateCardForm'
+            'CreateCardForm',
+            'WipeCardForm'
         ];
 
         protected function init()
@@ -184,7 +187,64 @@ use chillerlan\QRCode\QROptions;
         }
 
         public function wipe() {
-            die('not implemeted');
+            return $this->customise([
+                'Form' => $this->WipeCardForm()
+            ])->renderWith('Page');
+        }
+
+        public function WipeCardForm() {
+            $fields = new FieldList(
+                DropdownField::create('card_name', 'Card to wipe: ', cards::get()->filter('wiped:not', 'Y')->map('card_name', 'card_name'))->setEmptyString('Select one')
+            );
+
+
+            $actions = new FieldList(
+                FormAction::create('doWipeCard')->setTitle('Wipe')
+            );
+
+            $required = new RequiredFields('card_id');
+
+            $form = new Form($this, 'WipeCardForm', $fields, $actions, $required);
+
+            return $form;
+        }
+
+        public function doWipeCard($data, $form) {
+            //validation
+            if(!$card = cards::get()->find('card_name', $data['card_name'])) {
+                $form->sessionMessage('Card not found');
+                return $this->redirectBack();
+            }
+
+
+            $query = [
+                'card_name' => $card->card_name
+            ];
+            $boltcard_hostname = Environment::getEnv('SS_BOLTCARD_HOST');
+
+            //@TODO: make it able to set the container name?
+            $res = (new GuzzleHttp\Client())->request('GET', 'boltcard_main:9001/wipeboltcard', [
+                'query' => $query
+            ]);
+
+            $response = json_decode($res->getBody());
+            //IF SUCCESS
+            //{"status": "OK", "url": "...."}
+            if($response->status == 'OK') {
+                
+                $options = new QROptions([
+                    'scale' => 20,
+                    'imageTransparent' => false
+                ]);
+                $qrcode = (new QRCode($options))->render($response);
+
+                return $this->customise([
+                    'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><img src="'.$qrcode.'" alt="QR Code" width="500" height="500" />')
+                ])->renderWith('Page');
+            } else if($response->status == 'ERROR') {
+                $form->sessionMessage('There was an api error: '.$response->reason);
+                return $this->redirectBack();
+            }
         }
     }
 }

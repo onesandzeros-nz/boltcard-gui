@@ -29,6 +29,7 @@
 			</tbody>
 		</table>
 		<a href="CardController/createcard" class="btn btn-primary">Create Bolt Card</a>
+		<a href="CardController/wipecard" class="btn btn-primary">Wipe Bolt Card</a>
 
 	</article>
 </div>
