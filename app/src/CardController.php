@@ -153,22 +153,24 @@ use chillerlan\QRCode\QRCode;
             $res = (new GuzzleHttp\Client())->request('GET', 'boltcard_main:9001/createboltcard', [
                 'query' => $query
             ]);
+
+            $response = json_docode($res->getBody());
             //IF SUCCESS
             //{"status": "OK", "url": "...."}
-            if($res['status'] == 'OK') {
+            if($response->status == 'OK') {
                 $newCard = cards::get()->find('card_name', $data['card_name']);
                 if(!$newCard) {
                     $form->sessionMessage('There was a problem creating a new card');
                     return $this->redirectBack();
                 }
-                $url = $res['url'];
+                $url = $response->url;
                 $qrcode = (new QRCode($options))->render($url);
 
                 return $this->customise([
                     'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><p>'.$url.'</p><img src="'.$url.'" alt="QR Code" width="500" height="500" />')
                 ])->renderWith('Page');
-            } else if($res['status'] == 'ERROR') {
-                $form->sessionMessage('There was an api error: '.$res['reason']);
+            } else if($response->status == 'ERROR') {
+                $form->sessionMessage('There was an api error: '.$response->reason);
                 return $this->redirectBack();
             }
         }
