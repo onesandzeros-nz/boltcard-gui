@@ -8,3 +8,4 @@ SilverStripe\Control\Director:
   rules:
     'CardController': 'CardController'
     'CardEditController': 'CardEditController'
+    'settings': 'SettingsController'

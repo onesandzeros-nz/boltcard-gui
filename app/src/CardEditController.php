@@ -2,10 +2,11 @@
 
 namespace {
 
+use SilverStripe\CMS\Controllers\ContentController;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
-use SilverStripe\CMS\Controllers\ContentController;
 
     class CardEditController extends PageController
     {
@@ -37,8 +38,8 @@ use SilverStripe\CMS\Controllers\ContentController;
             // See: https://docs.silverstripe.org/en/developer_guides/templates/requirements/
         }
 
-        public function index(){
-            $card_id = $this->request->Param('ID');
+        public function index(HTTPRequest $request){
+            $card_id = $request->Param('ID');
             $card = cards::get()->find('card_id', $card_id);
 
             return $this->customise(['Card'=>$card])->renderWith(['Page']);
