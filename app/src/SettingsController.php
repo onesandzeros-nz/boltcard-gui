@@ -175,10 +175,11 @@ use SilverStripe\View\ArrayData;
 
 					        $config = [
 					            'conflict' => AssetStore::CONFLICT_OVERWRITE,
-					            'visibility' => AssetStore::VISIBILITY_PUBLIC
+					            'visibility' => AssetStore::VISIBILITY_PROTECTED
 					        ];
-							$file->setFromLocalFile($tmp_name, $folderName.$filename, null, null, $config);
+							$file->setFromLocalFile($tmp_name, $folderName.$filename, 'a870de278b475cb75f5d9f451439b2d378e13af1', null, $config);
 							$file->write();
+							$file->protectFile();
 						}
 					}
 				}
