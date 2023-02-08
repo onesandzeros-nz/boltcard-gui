@@ -1,2 +1,18 @@
 SilverStripe\CMS\Model\SiteTree:
   create_default_pages: false
+
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Assets\Upload_Validator:
+    class: SilverStripe\MimeValidator\MimeUploadValidator
+
+SilverStripe\MimeValidator\MimeUploadValidator:
+  MimeTypes:
+    cert: 
+      - application/pkix-cert
+      - text/plain # added this because PHP finfo function is not returning a correct MIME type for .cert files
+    macaroon: application/octet-stream
+
+SilverStripe\Assets\File:
+  allowed_extensions:
+    - cert
+    - macaroon

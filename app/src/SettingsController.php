@@ -2,7 +2,11 @@
 
 namespace {
 
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Storage\AssetStore;
+use SilverStripe\Assets\Upload;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FileField;
@@ -11,7 +15,9 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextField;
+use SilverStripe\MimeValidator\MimeUploadValidator;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\ValidationResult;
 use SilverStripe\View\ArrayData;
 
 	class SettingsController extends PageController {
@@ -89,8 +95,8 @@ use SilverStripe\View\ArrayData;
 				NumericField::create('MAX_WITHDRAW_SATS'),
 				TextField::create('LN_HOST'),
 				NumericField::create('LN_PORT'),
-				FileField::create('LN_TLS_FILE'),
-				FileField::create('LN_MACAROON_FILE'),
+				$tlsUploadField = FileField::create('LN_TLS_FILE'),
+				$macaroonUploadField = FileField::create('LN_MACAROON_FILE'),
 				NumericField::create('FEE_LIMIT_SAT'),
 				NumericField::create('FEE_LIMIT_PERCENT')->setScale(1)->setAttribute('min', 0)->setAttribute('max', 1),
 				TextField::create('LN_TESTNODE'),
@@ -101,6 +107,9 @@ use SilverStripe\View\ArrayData;
 				DropdownField::create('FUNCTION_EMAIL', 'FUNCTION_EMAIL', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
 				DropdownField::create('FUNCTION_INTERNAL_API', 'FUNCTION_INTERNAL_API', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE'])
 			);
+
+			$tlsUploadField->setValidator(MimeUploadValidator::create())->setAllowedExtensions(['cert']);
+			$macaroonUploadField->setValidator(MimeUploadValidator::create())->setAllowedExtensions(['macaroon']);
 
 			$actions = new FieldList(
 				FormAction::create('doSave')->setTitle('Save')
@@ -122,7 +131,6 @@ use SilverStripe\View\ArrayData;
 		}
 
 		public function doSave($data, $form) {
-
 			// die('<pre>'.print_r($data, true));
 			foreach($data as $name => $val) {
 				if($setting = settings::get()->find('name', $name)) {
@@ -133,6 +141,45 @@ use SilverStripe\View\ArrayData;
 					} else {
 						//@TODO: upload files to a specific path
 						//make sure to protect the files
+						if(isset($val['name']) && isset($val['tmp_name']) && $val['name'] && !empty($val['tmp_name'])) {
+							$tmp_name = $val['tmp_name'];
+							$type = $val['type'];
+
+							$file = File::create();
+							$filename = '';
+
+							$folderName = 'boltcard/';
+							switch($name) {
+								case 'LN_TLS_FILE':
+									if($type != 'application/pkix-cert') {
+										//validate the cert file MIME TYPE here just for LN_TLS_FILE
+										//because PHP finfo function does not return correct MIME type for .cert files so SS is allowing 'text/plain' MIME type as well 
+										$validationResult = new ValidationResult();
+							            $validationResult->addFieldError('LN_TLS_FILE', 'File type does not match extension (.cert)');
+							            $form->setSessionValidationResult($validationResult);
+										$form->setSessionData($form->getData());
+										return $this->redirectBack();
+									}
+									$filename = 'tls.cert';
+									if(File::get()->find('FileFilename', $folderName.$filename)) {
+										$file = File::get()->find('FileFilename', $folderName.$filename);
+									}
+									break;
+								case 'LN_MACAROON_FILE':
+									$filename = 'admin.macaroon';
+									if(File::get()->find('FileFilename', $folderName.$filename)) {
+										$file = File::get()->find('FileFilename', $folderName.$filename);
+									}
+									break;
+							}
+
+					        $config = [
+					            'conflict' => AssetStore::CONFLICT_OVERWRITE,
+					            'visibility' => AssetStore::VISIBILITY_PUBLIC
+					        ];
+							$file->setFromLocalFile($tmp_name, $folderName.$filename, null, null, $config);
+							$file->write();
+						}
 					}
 				}
 			}
