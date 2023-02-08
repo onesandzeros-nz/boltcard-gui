@@ -215,7 +215,7 @@ use chillerlan\QRCode\QROptions;
                     'scale' => 20,
                     'imageTransparent' => false
                 ]);
-                $qrcode = (new QRCode($options))->render(json_decode($response));
+                $qrcode = (new QRCode($options))->render(json_encode($response));
 
                 return $this->customise([
                     'Content' => DBField::create_field('HTMLText', '<p>Scan the QR code below.</p><img src="'.$qrcode.'" alt="QR Code" width="500" height="500" />')
