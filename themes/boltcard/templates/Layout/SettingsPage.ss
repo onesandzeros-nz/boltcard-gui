@@ -3,6 +3,18 @@
 	<article>
 		<h1>$Title</h1>
 		<div class="content">
+			<% if not certExists || not macaroonExists %>
+			<p style="color:#b80000;">
+				<strong>
+					<% if not certExists %>
+					Add the tls.cert file <br/>
+					<% end_if %>
+					<% if not macaroonExists %>
+					Add the admin.macaroon file
+					<% end_if %>
+				</strong>
+			</p>
+			<% end_if %>
 			<table>
 				<% loop Settings %>
 				<tr>

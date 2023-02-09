@@ -42,5 +42,10 @@ namespace {
         public function Cards(){
             return cards::get();
         }
+
+        public function SettingsController() {
+
+            return SettingsController::create();
+        }
     }
 }

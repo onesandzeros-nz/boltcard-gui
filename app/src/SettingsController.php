@@ -104,8 +104,7 @@ use SilverStripe\View\ArrayData;
 				//@TODO: default to disable
 				DropdownField::create('FUNCTION_LNURLP', 'FUNCTION_LNURLP', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
 				//@TODO: default to disable
-				DropdownField::create('FUNCTION_EMAIL', 'FUNCTION_EMAIL', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
-				DropdownField::create('FUNCTION_INTERNAL_API', 'FUNCTION_INTERNAL_API', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE'])
+				DropdownField::create('FUNCTION_EMAIL', 'FUNCTION_EMAIL', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE'])
 			);
 
 			$tlsUploadField->setValidator(MimeUploadValidator::create())->setAllowedExtensions(['cert']);
@@ -185,6 +184,14 @@ use SilverStripe\View\ArrayData;
 				}
 			}
 			return $this->redirect($this->Link());
+		}
+
+		public function certExists() {
+			return File::get()->find('FileFilename', 'boltcard/tls.cert');
+		}
+
+		public function macaroonExists() {
+			return File::get()->find('FileFilename', 'boltcard/admin.macaroon');
 		}
 
 		public function Title() {
