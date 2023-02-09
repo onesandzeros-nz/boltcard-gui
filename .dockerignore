@@ -4,7 +4,8 @@ init.sql
 public/assets/
 !public/assets/.htaccess
 !public/assets/web.config
-public/_graphql
+public/_graphql/*
 public/_resources
 vendor/
 docker-compose.yml
+.graphql-generated/*

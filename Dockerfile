@@ -12,6 +12,6 @@ RUN chown 1000:www-data $DOCUMENT_ROOT -R
 RUN mkdir -p .graphql-generated
 RUN mkdir -p public/.graphql
 RUN chown www-data:www-data .graphql-generated -R
-RUN chown www-data:www-data public/.graphql -R
+RUN chown www-data:www-data public/_graphql -R
 RUN chown www-data:www-data public/assets -R
 WORKDIR $DOCUMENT_ROOT
