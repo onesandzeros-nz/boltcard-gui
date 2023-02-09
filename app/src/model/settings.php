@@ -15,4 +15,18 @@ class settings extends DataObject {
 		'name',
 		'value'
 	];
+
+	public function requireDefaultRecords() {
+		parent::requireDefaultRecords();
+		$aesDecryptKey = settings::get()->find('name', 'AES_DECRYPT_KEY');
+		if(!$aesDecryptKey) {
+			$aesDecryptKey = settings::create();
+			$aesDecryptKey->name = 'AES_DECRYPT_KEY';
+		}
+		if(!$aesDecryptKey->value) {
+			$bytes = openssl_random_pseudo_bytes(16);
+			$aesDecryptKey->value = bin2hex($bytes);
+			$aesDecryptKey->write();
+		}
+	}
 }
