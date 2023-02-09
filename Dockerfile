@@ -11,7 +11,9 @@ RUN mkdir -p public/assets/.protected/boltcard/a870de278b
 RUN chown 1000:www-data $DOCUMENT_ROOT -R
 RUN mkdir -p .graphql-generated
 RUN mkdir -p public/.graphql
+RUN mkdir -p /boltcard-files
 RUN chown www-data:www-data .graphql-generated -R
 RUN chown www-data:www-data public/_graphql -R
 RUN chown www-data:www-data public/assets -R
+RUN chown www-data:www-data /boltcard-files
 WORKDIR $DOCUMENT_ROOT

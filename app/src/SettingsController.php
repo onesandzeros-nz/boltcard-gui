@@ -91,13 +91,13 @@ use SilverStripe\View\ArrayData;
 			$fields = new FieldList(
 				DropdownField::create('LOG_LEVEL', 'LOG_LEVEL', ['DEBUG' => 'DEBUG', 'PRODUCTION' => 'PRODUCTION']),
 				TextField::create('HOST_DOMAIN'),
-				NumericField::create('MIN_WITHDRAW_SATS'),
-				NumericField::create('MAX_WITHDRAW_SATS'),
+				TextField::create('MIN_WITHDRAW_SATS')->setAttribute('pattern', '[0-9]+'),
+				TextField::create('MAX_WITHDRAW_SATS')->setAttribute('pattern', '[0-9]+'),
 				TextField::create('LN_HOST'),
-				NumericField::create('LN_PORT'),
+				TextField::create('LN_PORT')->setAttribute('pattern', '[0-9]+'),
 				$tlsUploadField = FileField::create('LN_TLS_FILE'),
 				$macaroonUploadField = FileField::create('LN_MACAROON_FILE'),
-				NumericField::create('FEE_LIMIT_SAT'),
+				TextField::create('FEE_LIMIT_SAT')->setAttribute('pattern', '[0-9]+'),
 				NumericField::create('FEE_LIMIT_PERCENT')->setScale(1)->setAttribute('min', 0)->setAttribute('max', 1),
 				TextField::create('LN_TESTNODE'),
 				DropdownField::create('FUNCTION_LNURLW', 'FUNCTION_LNURLW', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
@@ -143,10 +143,8 @@ use SilverStripe\View\ArrayData;
 							$tmp_name = $val['tmp_name'];
 							$type = $val['type'];
 
-							$file = File::create();
+							$path = '/boltcard-files/';
 							$filename = '';
-
-							$folderName = 'boltcard/';
 							switch($name) {
 								case 'LN_TLS_FILE':
 									if($type != 'application/pkix-cert') {
@@ -159,25 +157,18 @@ use SilverStripe\View\ArrayData;
 										return $this->redirectBack();
 									}
 									$filename = 'tls.cert';
-									if(File::get()->find('FileFilename', $folderName.$filename)) {
-										$file = File::get()->find('FileFilename', $folderName.$filename);
-									}
 									break;
 								case 'LN_MACAROON_FILE':
 									$filename = 'admin.macaroon';
-									if(File::get()->find('FileFilename', $folderName.$filename)) {
-										$file = File::get()->find('FileFilename', $folderName.$filename);
-									}
 									break;
 							}
 
-					        $config = [
-					            'conflict' => AssetStore::CONFLICT_OVERWRITE,
-					            'visibility' => AssetStore::VISIBILITY_PROTECTED
-					        ];
-							$file->setFromLocalFile($tmp_name, $folderName.$filename, 'a870de278b475cb75f5d9f451439b2d378e13af1', null, $config);
-							$file->write();
-							$file->protectFile();
+							$fp = fopen($path.$filename, 'w');
+							$fcontent = file_get_contents($tmp_name);
+							fwrite($fp, $fcontent);
+							fclose($fp);
+
+
 						}
 					}
 				}
@@ -186,11 +177,11 @@ use SilverStripe\View\ArrayData;
 		}
 
 		public function certExists() {
-			return File::get()->find('FileFilename', 'boltcard/tls.cert');
+			return file_exists('/boltcard-files/tls.cert');
 		}
 
 		public function macaroonExists() {
-			return File::get()->find('FileFilename', 'boltcard/admin.macaroon');
+			return file_exists('/boltcard-files/admin.macaroon');
 		}
 
 		public function Title() {
