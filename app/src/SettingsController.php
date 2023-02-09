@@ -103,8 +103,7 @@ use SilverStripe\View\ArrayData;
 				DropdownField::create('FUNCTION_LNURLW', 'FUNCTION_LNURLW', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
 				//@TODO: default to disable
 				DropdownField::create('FUNCTION_LNURLP', 'FUNCTION_LNURLP', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE']),
-				//@TODO: default to disable
-				DropdownField::create('FUNCTION_EMAIL', 'FUNCTION_EMAIL', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE'])
+				// DropdownField::create('FUNCTION_EMAIL', 'FUNCTION_EMAIL', ['ENABLE' => 'ENABLE', 'DISABLE' => 'DISABLE'])
 			);
 
 			$tlsUploadField->setValidator(MimeUploadValidator::create())->setAllowedExtensions(['cert']);
