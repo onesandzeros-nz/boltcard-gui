@@ -138,21 +138,21 @@ use chillerlan\QRCode\QROptions;
             foreach($data as $key => $val ) {
                 if(in_array($key, $boolean_values)) {
                     $data[$key] = $val ? 'true' : 'false';
-                }
-                if(filter_var($val, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND)) {
+                } elseif(filter_var($val, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND)) {
                     $data[$key] = filter_var($val, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND);
                 }
             }
 
             $whitelist = [
-                'card_name',
-                'enable',
-                'tx_max',
-                'day_max',
-                'uid_privacy',
-                'allow_neg_bal'
+                'card_name' => '',
+                'enable' => 'false',
+                'tx_max' => '0',
+                'day_max' => '0',
+                'uid_privacy' => 'false',
+                'allow_neg_bal' => 'false'
             ];
-            $query = array_intersect_key($data, array_flip($whitelist));
+            $query = array_merge($whitelist, array_intersect_key($data, $whitelist));
+
             $boltcard_hostname = Environment::getEnv('SS_BOLTCARD_HOST');
 
             //@TODO: make it able to set the container name?
